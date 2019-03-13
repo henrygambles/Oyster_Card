@@ -45,15 +45,26 @@ describe Oystercard do
       expect(card_with_money).to respond_to(:touch_in)
     end
 
+    # it 'starts a journey when you touch in' do
+    #   card_with_money.touch_in
+    #   expect(card_with_money.in_journey?).to eq true
+    # end
+
     it 'starts a journey when you touch in' do
-      card_with_money.touch_in
-      expect(card_with_money).to have_attributes(:journey => true)
-      #expect(card.touch_in).to eq(true)
+      card.top_up(5)
+      card.touch_in
+      expect(card.in_journey?).to eq true
     end
 
     # it 'raises error if balance less than minimum fare' do
-    #   expect { card.balance }.to raise_error("Insufficient funds")
+    #   card.touch_in
+    #   expect(card.in_journey?).to eq false
+      # expect { card.touch_in }.to raise_error("Insufficient funds")
     # end
+
+    it 'raises an error if balance is less than £1' do
+      expect{card.touch_in}.to raise_error "No Money"
+    end
 
   end
 
@@ -70,10 +81,16 @@ describe Oystercard do
   end
   
   describe '#in_journey?' do
-    it 'checks that we are in jouney (underground)' do
-      card_with_money.touch_in
-      expect(card_with_money).to be_in_journey
+  #   it 'checks that we are in jouney (underground)' do
+  #     card_with_money.touch_in
+  #     expect(card_with_money).to be_in_journey
+  #   end
+    it 'checks that we are in journey' do
+      card.top_up(5)
+      card.touch_in
+      expect(card.in_journey?).to eq true
     end
+
 
     it 'checks that we are not in jouney' do
       expect(card).not_to be_in_journey
