@@ -29,15 +29,15 @@ describe Oystercard do
 
   end
 
-  describe '#deduct' do 
+  # describe '#deduct' do 
 
-    it { is_expected.to respond_to(:deduct).with(1).argument }
+  #   it { is_expected.to respond_to(:deduct).with(1).argument }
 
-    it 'balance should change when deducted' do 
-      expect{ card_with_money.deduct 3}.to change{ card_with_money.balance }.by -3
-    end
+  #   it 'balance should change when deducted' do 
+  #     expect{ card_with_money.deduct 3}.to change{ card_with_money.balance }.by -3
+  #   end
 
-  end
+  # end
 
   describe '#touch_in' do 
 

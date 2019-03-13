@@ -5,7 +5,6 @@ class Oystercard
   MIN_FARE = 1
 
   attr_reader :balance, :journey
-  attr_writer :balance
 
   def initialize(journey = false)
     @balance = 0
@@ -15,10 +14,6 @@ class Oystercard
   def top_up(amount)
     fail 'Maximum balance of 90 exceeded' if amount + balance > MAX_BALANCE
     @balance += amount
-  end
-
-  def deduct(amount)
-    @balance -= amount
   end
 
   def touch_in
@@ -35,5 +30,11 @@ class Oystercard
     @journey
   end
 
+  private
+
+
+  def deduct(amount)
+    @balance -= amount
+  end
 
 end
