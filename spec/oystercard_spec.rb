@@ -78,6 +78,12 @@ describe Oystercard do
       expect(card).to have_attributes(:journey => false)
     end
 
+    it 'deducts min fare from card when journey complete/touching out' do
+      card.top_up(5)
+      card.touch_in
+      expect{subject.touch_out}.to change {subject.balance}.by(-1)
+    end
+
   end
   
   describe '#in_journey?' do
