@@ -41,29 +41,21 @@ describe Oystercard do
 
   describe '#touch_in' do 
 
-    it 'allows the customer to touch in and pass through the barriers' do
-      expect(card_with_money).to respond_to(:touch_in)
-    end
-
-    # it 'starts a journey when you touch in' do
-    #   card_with_money.touch_in
-    #   expect(card_with_money.in_journey?).to eq true
-    # end
+    it { is_expected.to respond_to(:touch_in).with(1).argument }
 
     it 'starts a journey when you touch in' do
       card.top_up(5)
-      card.touch_in
+      card.touch_in("EC")
       expect(card.in_journey?).to eq true
     end
 
-    # it 'raises error if balance less than minimum fare' do
-    #   card.touch_in
-    #   expect(card.in_journey?).to eq false
-      # expect { card.touch_in }.to raise_error("Insufficient funds")
-    # end
-
     it 'raises an error if balance is less than £1' do
-      expect{card.touch_in}.to raise_error "No Money"
+      expect{card.touch_in("EC")}.to raise_error "No Money"
+    end
+    
+    it 'stores entry station station' do
+      card.top_up(5)
+      expect{card.touch_in("Aldgate")}.to change{card.entry_station}.from(nil).to("Aldgate")
     end
 
   end
@@ -80,7 +72,7 @@ describe Oystercard do
 
     it 'deducts min fare from card when journey complete/touching out' do
       card.top_up(5)
-      card.touch_in
+      card.touch_in("EC")
       expect{subject.touch_out}.to change {subject.balance}.by(-1)
     end
 
@@ -93,7 +85,7 @@ describe Oystercard do
   #   end
     it 'checks that we are in journey' do
       card.top_up(5)
-      card.touch_in
+      card.touch_in("EC")
       expect(card.in_journey?).to eq true
     end
 
