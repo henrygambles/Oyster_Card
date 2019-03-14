@@ -19,34 +19,26 @@ class Oystercard
 
   def touch_in(entry_station, journey_class = Journey)
     fail "No Money" if @balance < MIN_BALANCE
-    @journey = journey_class.new
+    @journey = journey_class.new(entry_station, exit_station = nil, self)
     @entry_station = entry_station
   end
 
-  def touch_out(exit_station = nil)
+  def touch_out(exit_station = nil, journey = @journey)
     deduct(MIN_FARE)
     @exit_station = exit_station
-    make_trip
-    end_trip
-  end
+    journey.make_trip
+    journey.end_trip
+    store(journey.trip_log)
+    @exit_station = nil
 
-  def in_journey?
-    p @journey
-    p @journey.nil?
-    !@journey.nil?
   end
 
   def store(trip_log)
     @travel_log << trip_log
   end
 
-  def make_trip
-    @trip_log = { :entry_station => @entry_station, :exit_station => @exit_station }
-  end
-
-  def end_trip
-    store(@trip_log)
-    @entry_station, @exit_station, @journey = nil, nil, false
+  def in_journey?
+    @journey.in_journey?
   end
 
   private

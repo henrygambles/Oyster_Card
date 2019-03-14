@@ -76,22 +76,27 @@ describe Oystercard do
     end
 
     it 'ends a journey when you touch out' do 
-      card.touch_out
-      expect(card).to have_attributes(:journey => false)
+      allow(journey_double).to receive(:make_trip)
+      expect(journey_double).to receive(:end_trip)
+      card.touch_out(exit_station_double, journey_double)
     end
 
     it 'deducts min fare from card when journey complete/touching out' do
       card.top_up(5)
-      allow(journey_class_double).to receive(:new)
+      allow(journey_class_double).to receive(:new).and_return(journey_double)
+      allow(journey_double).to receive(:make_trip)
+      allow(journey_double).to receive(:end_trip)
       card.touch_in(entry_station_double, journey_class_double)
       expect{subject.touch_out}.to change {subject.balance}.by(-1)
     end
     
     it 'forgets entry station' do
       card.top_up(5)
-      allow(journey_class_double).to receive(:new)
+      allow(journey_class_double).to receive(:new).and_return(journey_double)
+      allow(journey_double).to receive(:make_trip)
+      allow(journey_double).to receive(:end_trip)
       card.touch_in(entry_station_double, journey_class_double)
-      expect{card.touch_out}.to change{card.entry_station}.from(entry_station_double).to(nil)
+      expect(card.touch_out(exit_station_double)).to eq nil
     end
 
   end
@@ -101,16 +106,16 @@ describe Oystercard do
   #     card_with_money.touch_in
   #     expect(card_with_money).to be_in_journey
   #   end
-    it 'checks that we are in journey' do
-      card.top_up(5)
-      allow(journey_class_double).to receive(:new).and_return(journey_double)
-      card.touch_in(entry_station_double, journey_class_double)
-      expect(card).to be_in_journey
-    end
+    # it 'checks that we are in journey' do
+    #   card.top_up(5)
+    #   allow(journey_class_double).to receive(:new).and_return(journey_double)
+    #   card.touch_in(entry_station_double, journey_class_double)
+    #   expect(card).to be_in_journey
+    # end
 
-    it 'checks that we are not in jouney' do
-      expect(card).not_to be_in_journey
-    end
+    # it 'checks that we are not in jouney' do
+    #   expect(card).not_to be_in_journey
+    # end
 
   describe '#trips' do
 
