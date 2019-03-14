@@ -4,8 +4,16 @@ describe Oystercard do
 
   it {is_expected.to respond_to(:balance)}   
   subject(:card) {Oystercard.new}
-  subject(:card_with_money) {Oystercard.new(balance: 10)}
+  # subject(:card_with_money) {Oystercard.new(balance: 10)}
   #interested to further understand how syntax is operating.
+
+  let(:journey_double) {double(:journey)}
+  let(:journey_class_double) {double(:journey_class)}
+  let(:trip_log_double) {double(:trip_log)}
+  let(:entry_station_double) {double(:entry_station)}
+  let(:exit_station_double) {double(:exit_station)}
+  # journey_double = double(:journey)
+  #for inside an it block
   
 
   describe '#Balance' do
@@ -43,19 +51,21 @@ describe Oystercard do
 
     it { is_expected.to respond_to(:touch_in).with(1).argument }
 
-    it 'starts a journey when you touch in' do
+    it 'create a new journey when you touch in' do
       card.top_up(5)
-      card.touch_in("EC")
-      expect(card.in_journey?).to eq true
+      expect(journey_class_double).to receive(:new)
+      card.touch_in(entry_station_double, journey_class_double)
     end
 
     it 'raises an error if balance is less than £1' do
-      expect{card.touch_in("EC")}.to raise_error "No Money"
+      allow(journey_class_double).to receive(:new)
+      expect{card.touch_in(entry_station_double, journey_class_double)}.to raise_error "No Money"
     end
     
     it 'stores entry station station' do
       card.top_up(5)
-      expect{card.touch_in("Aldgate")}.to change{card.entry_station}.from(nil).to("Aldgate")
+      allow(journey_class_double).to receive(:new)
+      expect{card.touch_in(entry_station_double, journey_class_double)}.to change{card.entry_station}.from(nil).to(entry_station_double)
     end
 
   end
@@ -72,14 +82,16 @@ describe Oystercard do
 
     it 'deducts min fare from card when journey complete/touching out' do
       card.top_up(5)
-      card.touch_in("EC")
+      allow(journey_class_double).to receive(:new)
+      card.touch_in(entry_station_double, journey_class_double)
       expect{subject.touch_out}.to change {subject.balance}.by(-1)
     end
     
     it 'forgets entry station' do
       card.top_up(5)
-      card.touch_in("EC")
-      expect{card.touch_out}.to change{card.entry_station}.from("EC").to(nil)
+      allow(journey_class_double).to receive(:new)
+      card.touch_in(entry_station_double, journey_class_double)
+      expect{card.touch_out}.to change{card.entry_station}.from(entry_station_double).to(nil)
     end
 
   end
@@ -91,16 +103,40 @@ describe Oystercard do
   #   end
     it 'checks that we are in journey' do
       card.top_up(5)
-      card.touch_in("EC")
-      expect(card.in_journey?).to eq true
+      allow(journey_class_double).to receive(:new).and_return(journey_double)
+      card.touch_in(entry_station_double, journey_class_double)
+      expect(card).to be_in_journey
     end
-
 
     it 'checks that we are not in jouney' do
       expect(card).not_to be_in_journey
     end
 
+  describe '#trips' do
+
+    it 'checks that travel log is empty when initialized' do
+      expect(card.travel_log).to eq []
+    end
+
+    it 'stores a trip after tap out' do
+      # card.top_up(5)
+      # card.touch_in(journey_double)
+      # card.touch_out(journey_double)
+      card.store(trip_log_double)
+      expect(card.travel_log).to eq [trip_log_double]
+      end
+
+    it 'stores a journey with entry station & exit, then adds trip to travel log' do
+      card.top_up(5)
+      allow(journey_class_double).to receive(:new)
+      card.touch_in(entry_station_double, journey_class_double)
+      card.touch_out(exit_station_double)
+      expect(card.travel_log).to eq [{ :entry_station => entry_station_double, :exit_station => exit_station_double }]
+    end
+
+    end
   end
+  
 end
 
 
